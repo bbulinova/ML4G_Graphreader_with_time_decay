@@ -1,8 +1,8 @@
-# main.py
 import json
 from preprocessing.chunking import chunk_text_preserve_paragraphs
 from preprocessing.fact_extraction import extract_atomic_facts_from_chunks
 from preprocessing.temporal import assign_random_timestamps
+from decay.time_decay import apply_time_decay
 
 DATA_PATH = "data/hotpot_sample.json"
 
@@ -43,9 +43,25 @@ for s in samples:
     for f in facts:
         print(f"  fact {f.fact_id} (chunk {f.chunk_id}): {f.text}")
 
-    # temporal facts
+    # adding time stamps to atomic facts
     temporal_facts = assign_random_timestamps(facts, seed=42)
 
     print("Temporal facts (first 5):")
     for tf in temporal_facts[:5]:
         print(f"  fact {tf.fact_id} (chunk {tf.chunk_id}) t={tf.timestamp}: {tf.text}")
+
+    # time decay
+    t_now = 10      # "current time" for this run
+    lamb = 0.4      # decay rate (tune later)
+
+    weighted_facts = apply_time_decay(temporal_facts, t_now=t_now, lamb=lamb)
+
+    print(f"Weighted facts (t_now={t_now}, lamb={lamb}) first 5:")
+    for wf in weighted_facts[:5]:
+        print(f"  fact {wf.fact_id} t={wf.timestamp} w={wf.weight:.3f}: {wf.text}")
+
+    # sorting by weight 
+    top_recent = sorted(weighted_facts, key=lambda x: x.weight, reverse=True)[:3]
+    print("Top 3 most 'recent' facts by weight:")
+    for wf in top_recent:
+        print(f"  t={wf.timestamp} w={wf.weight:.3f} :: {wf.text}")
