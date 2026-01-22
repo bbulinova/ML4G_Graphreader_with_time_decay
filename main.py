@@ -3,6 +3,7 @@ from preprocessing.chunking import chunk_text_preserve_paragraphs
 from preprocessing.fact_extraction import extract_atomic_facts_from_chunks
 from preprocessing.temporal import assign_random_timestamps
 from decay.time_decay import apply_time_decay
+from query.retrieve import rank_facts_no_decay, rank_facts_with_decay
 
 DATA_PATH = "data/hotpot_sample.json"
 
@@ -44,7 +45,8 @@ for s in samples:
         print(f"  fact {f.fact_id} (chunk {f.chunk_id}): {f.text}")
 
     # adding time stamps to atomic facts
-    temporal_facts = assign_random_timestamps(facts, seed=42)
+    seed = abs(hash(s["_id"])) % (2**32)
+    temporal_facts = assign_random_timestamps(facts, seed=seed)
 
     print("Temporal facts (first 5):")
     for tf in temporal_facts[:5]:
@@ -65,3 +67,14 @@ for s in samples:
     print("Top 3 most 'recent' facts by weight:")
     for wf in top_recent:
         print(f"  t={wf.timestamp} w={wf.weight:.3f} :: {wf.text}")
+
+    # retrieval 
+    print("\n--- RETRIEVAL (no decay) ---")
+    top_plain = rank_facts_no_decay(question, facts, top_k=5)
+    for r in top_plain:
+        print(f"score={r.score:.3f} :: {r.text}")
+
+    print("\n--- RETRIEVAL (with time decay) ---")
+    top_decay = rank_facts_with_decay(question, weighted_facts, top_k=5)
+    for r in top_decay:
+        print(f"score={r.score:.3f} :: {r.text}")
