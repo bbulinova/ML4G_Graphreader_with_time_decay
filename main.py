@@ -2,6 +2,7 @@
 import json
 from preprocessing.chunking import chunk_text_preserve_paragraphs
 from preprocessing.fact_extraction import extract_atomic_facts_from_chunks
+from preprocessing.temporal import assign_random_timestamps
 
 DATA_PATH = "data/hotpot_sample.json"
 
@@ -41,3 +42,10 @@ for s in samples:
     print("Num atomic facts:", len(facts))
     for f in facts:
         print(f"  fact {f.fact_id} (chunk {f.chunk_id}): {f.text}")
+
+    # temporal facts
+    temporal_facts = assign_random_timestamps(facts, seed=42)
+
+    print("Temporal facts (first 5):")
+    for tf in temporal_facts[:5]:
+        print(f"  fact {tf.fact_id} (chunk {tf.chunk_id}) t={tf.timestamp}: {tf.text}")
