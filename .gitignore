@@ -1,5 +1,4 @@
-
-# Datasets
-/data/
-*.json
+# Datasets (keep only tiny sample in git)
+data/*
+!data/hotpot_sample.json
 *.zip
