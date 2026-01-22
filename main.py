@@ -4,6 +4,7 @@ from preprocessing.fact_extraction import extract_atomic_facts_from_chunks
 from preprocessing.temporal import assign_random_timestamps
 from decay.time_decay import apply_time_decay
 from query.retrieve import rank_facts_no_decay, rank_facts_with_decay
+from evaluation.metrics import hit_at_k
 
 DATA_PATH = "data/hotpot_sample.json"
 
@@ -78,3 +79,9 @@ for s in samples:
     top_decay = rank_facts_with_decay(question, weighted_facts, top_k=5)
     for r in top_decay:
         print(f"score={r.score:.3f} :: {r.text}")
+
+    #evaluation metrics
+    for k in [1, 3, 5]:
+        h_plain = hit_at_k(top_plain, answer, k)
+        h_decay = hit_at_k(top_decay, answer, k)
+        print(f"Hit@{k}  no-decay={h_plain}  with-decay={h_decay}")
