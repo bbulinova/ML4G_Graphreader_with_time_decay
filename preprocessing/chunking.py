@@ -9,12 +9,13 @@ class Chunk:
     text: str
 
 
-def chunk_text_preserve_paragraphs(full_text: str, max_chars: int = 1800) -> List[Chunk]:
+def chunk_text_preserve_paragraphs(full_text: str, max_chars: int = 1200) -> List[Chunk]:
     """
-    Simple chunker:
-    - split by newline into paragraphs
-    - pack paragraphs into chunks up to ~max_chars
-    - preserves paragraph boundaries
+    Chunk text while preserving paragraph boundaries.
+
+    - Split by newline into paragraphs
+    - Accumulate paragraphs until adding another would exceed max_chars
+    - If a single paragraph is longer than max_chars, hard-split it
     """
     paragraphs = [p.strip() for p in full_text.split("\n") if p.strip()]
     chunks: List[Chunk] = []
@@ -23,15 +24,18 @@ def chunk_text_preserve_paragraphs(full_text: str, max_chars: int = 1800) -> Lis
     buf_len = 0
     chunk_id = 0
 
-    for p in paragraphs:
-        # if a single paragraph is longer than max_chars, hard-split it
-        if len(p) > max_chars:
-            # flush current buffer first
-            if buf:
-                chunks.append(Chunk(chunk_id=chunk_id, text="\n".join(buf)))
-                chunk_id += 1
-                buf, buf_len = [], 0
+    def flush():
+        nonlocal chunk_id, buf, buf_len
+        if buf:
+            chunks.append(Chunk(chunk_id=chunk_id, text="\n".join(buf)))
+            chunk_id += 1
+            buf = []
+            buf_len = 0
 
+    for p in paragraphs:
+        # If paragraph alone is too long: flush buffer and split paragraph
+        if len(p) > max_chars:
+            flush()
             start = 0
             while start < len(p):
                 part = p[start : start + max_chars]
@@ -40,17 +44,13 @@ def chunk_text_preserve_paragraphs(full_text: str, max_chars: int = 1800) -> Lis
                 start += max_chars
             continue
 
-        # if adding this paragraph would exceed max, flush buffer
-        if buf_len + len(p) + (1 if buf else 0) > max_chars:
-            chunks.append(Chunk(chunk_id=chunk_id, text="\n".join(buf)))
-            chunk_id += 1
-            buf, buf_len = [], 0
+        # If adding this paragraph would overflow the chunk -> flush first
+        extra = len(p) + (1 if buf else 0)  # +1 for newline join
+        if buf_len + extra > max_chars:
+            flush()
 
         buf.append(p)
-        buf_len += len(p) + (1 if buf_len > 0 else 0)
+        buf_len += extra
 
-    # flush remainder
-    if buf:
-        chunks.append(Chunk(chunk_id=chunk_id, text="\n".join(buf)))
-
+    flush()
     return chunks

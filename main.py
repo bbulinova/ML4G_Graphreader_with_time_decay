@@ -1,31 +1,36 @@
-### data loading 
-from data.load_hotpot import load_first_hotpot_samples
-
-train_path = "data/hotpot_train_v1.1.json"  # adjust your filename
-samples = load_first_hotpot_samples(train_path, n=2)
-
-for s in samples:
-    print("=" * 60)
-    print("ID:", s.sample_id)
-    print("Question:", s.question)
-    print("Gold answer:", s.answer)
-    print("Full text length:", len(s.full_text))
-    print("Text preview:", s.full_text[:300])
-
-### chunking
-
-
+# main.py
+import json
 from preprocessing.chunking import chunk_text_preserve_paragraphs
 
-for s in samples:
-    print("=" * 60)
-    print("ID:", s.sample_id)
-    print("Question:", s.question)
-    print("Gold answer:", s.answer)
-    print("Full text length:", len(s.full_text))
-    print("Text preview:", s.full_text[:300])
+DATA_PATH = "data/hotpot_sample.json"
 
-    chunks = chunk_text_preserve_paragraphs(s.full_text, max_chars=1800)
-    print(f"Num chunks: {len(chunks)}")
-    for c in chunks[:2]:
-        print(f"- Chunk {c.chunk_id} chars={len(c.text)} preview={c.text[:120]!r}")
+with open(DATA_PATH, "r", encoding="utf-8") as f:
+    samples = json.load(f)
+
+print(f"Loaded {len(samples)} samples")
+
+for s in samples:
+    question = s["question"]
+    answer = s["answer"]
+
+    # flatten context
+    paragraphs = []
+    for title, paras in s["context"]:
+        for p in paras:
+            paragraphs.append(p)
+
+    full_text = "\n".join(paragraphs)
+
+    print("=" * 60)
+    print("Question:", question)
+    print("Answer:", answer)
+    print("Text length:", len(full_text))
+    print("Preview:", full_text[:200])
+
+    # chunking
+    chunks = chunk_text_preserve_paragraphs(full_text, max_chars=250)
+    print("Num chunks:", len(chunks))
+
+    for c in chunks:
+        preview = c.text[:80].replace("\n", " ")
+        print(f"  chunk {c.chunk_id} chars={len(c.text)} :: {preview!r}")
