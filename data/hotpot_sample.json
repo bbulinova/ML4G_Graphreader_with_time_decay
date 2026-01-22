@@ -1,0 +1,51 @@
+[
+  {
+    "_id": "sample_1",
+    "question": "Which magazine was started first Arthur's Magazine or First for Women?",
+    "answer": "Arthur's Magazine",
+    "context": [
+      [
+        "Arthur's Magazine",
+        [
+          "Arthur's Magazine was an American literary magazine published in the 19th century.",
+          "It was founded in 1844 and was one of the earliest literary magazines in the United States."
+        ]
+      ],
+      [
+        "First for Women",
+        [
+          "First for Women is a woman's magazine published by Bauer Media Group.",
+          "It was first published in 1989 and focuses on health, beauty, and lifestyle topics."
+        ]
+      ]
+    ],
+    "supporting_facts": [
+      ["Arthur's Magazine", 1],
+      ["First for Women", 1]
+    ]
+  },
+  {
+    "_id": "sample_2",
+    "question": "The Oberoi family is part of a hotel company that has a head office in what city?",
+    "answer": "Delhi",
+    "context": [
+      [
+        "Oberoi Group",
+        [
+          "The Oberoi Group is an Indian multinational hotel company.",
+          "It is headquartered in Delhi, India and operates luxury hotels worldwide."
+        ]
+      ],
+      [
+        "Oberoi family",
+        [
+          "The Oberoi family founded the Oberoi Group.",
+          "They are known for their contributions to the hospitality industry in India."
+        ]
+      ]
+    ],
+    "supporting_facts": [
+      ["Oberoi Group", 1]
+    ]
+  }
+]
