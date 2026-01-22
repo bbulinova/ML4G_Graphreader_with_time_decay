@@ -1,6 +1,7 @@
 # main.py
 import json
 from preprocessing.chunking import chunk_text_preserve_paragraphs
+from preprocessing.fact_extraction import extract_atomic_facts_from_chunks
 
 DATA_PATH = "data/hotpot_sample.json"
 
@@ -34,3 +35,9 @@ for s in samples:
     for c in chunks:
         preview = c.text[:80].replace("\n", " ")
         print(f"  chunk {c.chunk_id} chars={len(c.text)} :: {preview!r}")
+    
+    # atomic facts
+    facts = extract_atomic_facts_from_chunks(chunks)
+    print("Num atomic facts:", len(facts))
+    for f in facts:
+        print(f"  fact {f.fact_id} (chunk {f.chunk_id}): {f.text}")
