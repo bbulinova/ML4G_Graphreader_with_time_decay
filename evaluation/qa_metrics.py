@@ -31,7 +31,7 @@ def f1_score(pred: str, gold: str) -> float:
     recall = num_same / len(gold_tokens)
     return 2 * precision * recall / (precision + recall)
 
-##### F1*
+### F1*
 def f1_star(pred: str, gold: str, recall_threshold: float = 0.5) -> float:
     pred_tokens = normalize(pred).split()
     gold_tokens = normalize(gold).split()
