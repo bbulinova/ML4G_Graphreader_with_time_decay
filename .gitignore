@@ -1,8 +1,9 @@
-# Datasets (keep only tiny sample in git)
-data/*
-!data/hotpot_sample.json
+# Ignore raw datasets
+/data/hotpot_train_v1.1.json
+/data/hotpot_dev_distractor_v1.json
 *.zip
 
-# Python cache
-__pycache__/
-*.pyc
+# Allow curated experiment datasets
+!data/d1_100.json
+!data/d2_20_contradictions.json
+!data/hotpot_sample.json
